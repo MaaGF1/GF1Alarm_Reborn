@@ -124,12 +124,21 @@ class MainApp:
 
     def start_capture(self):
         if not self.proxy_capture:
-            self.proxy_capture = GFLCaptureProxy(8080, "yundoudou", self.on_keys_captured)
-            self.proxy_capture.start()
-            self.update_system_proxy("capture", True, 8080)
-            self.log("[SYS] Capture proxy started on port 8080.")
-            self.btn_cap.config(state=tk.DISABLED)
-            self.btn_stop_cap.config(state=tk.NORMAL)
+            try:
+                temp_proxy = GFLCaptureProxy(8080, "yundoudou", self.on_keys_captured)
+                temp_proxy.start()
+                
+                self.proxy_capture = temp_proxy
+                self.update_system_proxy("capture", True, 8080)
+                self.log("[SYS] Capture proxy started on port 8080.")
+                
+                self.btn_cap.config(state=tk.DISABLED)
+                self.btn_stop_cap.config(state=tk.NORMAL)
+            except Exception as e:
+                self.proxy_capture = None
+                self.log(f"[SYS] Error starting capture proxy: {e}")
+                self.btn_cap.config(state=tk.NORMAL)
+                self.btn_stop_cap.config(state=tk.DISABLED)
 
     def stop_capture(self):
         if self.proxy_capture:
